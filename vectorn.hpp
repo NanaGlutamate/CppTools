@@ -2,6 +2,7 @@
 #define __VECTORN_HPP__
 
 #include <array>
+#include <cmath>
 
 template <typename E, int N>
 class VectorN {
