@@ -20,13 +20,15 @@ inline bool equal(const T& a, const T& b){
 template <>
 inline bool equal<float>(const float& a, const float& b){
     //using std::fabs;
-    return fabs(a-b) <= 1e-5f;
+    //return abs(reinterpret_cast<uint32_t>(a-b))&(!uint32_t(0x03))==0;
+    return fabs(a-b)<=1e-4;
 }
 
 template <>
 inline bool equal<double>(const double& a, const double& b){
     //using std::fabs;
-    return fabs(a-b) <= 1e-10;
+    //return abs(reinterpret_cast<uint64_t>(a-b))&(!uint64_t(0x03))==0;
+    return fabs(a-b)<=1e-12;
 }
 
 template<size_t d1, size_t d2, size_t d3, typename E>
@@ -69,7 +71,7 @@ inline std::ostream& print_mat(const E m[d1][d2], std::ostream& os){
     return os;
 };
 
-template <size_t d1, size_t d2, typename E=DEFAULT_ELEMENT>
+template <size_t d1, size_t d2, typename E=DEFAULT_ELEMENT, std::enable_if_t<!std::is_pointer_v<E>, int> = 0>
 class mat{
 public:
     E e[d1][d2];
@@ -190,6 +192,15 @@ public:
     //     mat_mul<d1, d2, side, E>(fst.e->e, sec.e->e, res.e->e);
     //     std::uninitialized_copy(&(res.e->e[0][0]), &(res.e->e[d1][0]), &(fst->e[0][0]));
     //     return std::move(fst);
+    // };
+    //
+    // template <std::enable_if_t<(d1==d2) && (d1*d1*sizeof(E)<64U), int> = 0>
+    // friend decltype(auto) operator*(const heap_mat& fst, heap_mat&& sec){
+    //     static heap_mat res;
+    //     res.set(static_cast<E>(0));
+    //     mat_mul<d1, d2, side, E>(fst.e->e, sec.e->e, res.e->e);
+    //     std::uninitialized_copy(&(res.e->e[0][0]), &(res.e->e[d1][0]), &(sec->e[0][0]));
+    //     return std::move(sec);
     // };
 
     friend std::ostream& operator<<(std::ostream& os, const heap_mat<d1, d2, E, _Alloc>& m){
